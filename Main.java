@@ -1,25 +1,44 @@
 import java.io.*;
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import javax.swing.*;
 import javax.imageio.*;
 import com.sksamuel.scrimage.*;
+import com.sksamuel.scrimage.color.*;
+import com.sksamuel.scrimage.pixels.*;
 import com.sksamuel.scrimage.nio.*;
 
 class Main {
 
-	// moved central variables to top so they can be accessed by all methods
 	public static JFrame frame;
   public static ImmutableImage mosaicImage;
 	public static BufferedImage image;
+
+	// will be used to store the average color for each segment of the image
+	public static ArrayList<Tile> imageTiles = new ArrayList<Tile>(); // Only needs to be 1D to store every square
+	
 	//xx2
   public static void main(String[] args) {
 		
     System.out.println("Good Morning World");
 
     loadMainImage();
-    mosaicImage = mosaicImage.contrast(2.0); // Testing
+    //mosaicImage = mosaicImage.contrast(2.0); // Testing
+
+    MakeSquares(mosaicImage, 4, 0, 0);
+
+    System.out.println("Image Division Complete");
+    
+    for (Tile tile : imageTiles) {
+      ImmutableImage tileImage = ImmutableImage.create(tile.length, tile.length);
+      tileImage = tileImage.map(pixel -> new RGBColor(tile.r, tile.g, tile.b).awt()); // This works
+      mosaicImage = mosaicImage.overlay(tileImage, tile.x, tile.y);
+    }
+
+    System.out.println( imageTiles.size() +  " squares drawn");
+
     image = mosaicImage.awt();
     
     SwingUtilities.invokeLater(new Runnable() {
@@ -28,6 +47,34 @@ class Main {
       }
     });
 		
+  }
+
+  public static void MakeSquares(ImmutableImage image, int minDepth, int x, int y) {
+    
+    if (minDepth <= 0) {
+      
+      RGBColor average = image.average();
+      int imgR = average.red;
+      int imgG = average.green;
+      int imgB = average.blue;
+      
+      imageTiles.add(new Tile(x, y, imgR, imgG, imgB, image.width));
+      return;
+    }
+
+    int halfImgLength = image.width/2;
+
+    /* Pattern:
+     * A B
+     * C D
+     */
+    
+    MakeSquares(image.trimRight(halfImgLength).trimBottom(halfImgLength), minDepth - 1, x, y);
+    MakeSquares(image.trimLeft(halfImgLength).trimBottom(halfImgLength), minDepth - 1, x + halfImgLength - 1, y);
+    MakeSquares(image.trimRight(halfImgLength).trimTop(halfImgLength), minDepth - 1, x, y + halfImgLength - 1);
+    MakeSquares(image.trimLeft(halfImgLength).trimTop(halfImgLength), minDepth - 1, x + halfImgLength - 1, y + halfImgLength - 1);
+    
+    
   }
 
   private static void createAndShowGUI() {
