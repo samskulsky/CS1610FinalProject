@@ -12,5 +12,17 @@ public class PexelsImage {
 		this.avg_color = avg_color;
 		this.tiny = tiny;
 	}
+
+	public int getID() {
+		return id;
+	}
+
+	public String getAvgColor() {
+		return avg_color;
+	}
+
+	public String getTiny() {
+		return tiny;
+	}
 	
 }
