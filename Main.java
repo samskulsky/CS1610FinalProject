@@ -10,6 +10,7 @@ import com.sksamuel.scrimage.color.*;
 import com.sksamuel.scrimage.pixels.*;
 import com.sksamuel.scrimage.nio.*;
 import com.sksamuel.scrimage.filter.*;
+import java.net.*;
 
 class Main {
 
@@ -21,14 +22,13 @@ class Main {
 	public static ArrayList<Tile> imageTiles = new ArrayList<Tile>(); // Only needs to be 1D to store every square
 	
 	//xx2
-  public static void main(String[] args) {
+  public static void main(String[] args) throws MalformedURLException, IOException {
 		
     System.out.println("Good Morning World");
 
     // Disabled to hide errors while I was testing
 		Pexels.retrieveImage("light");
-		System.out.println(Pexels.images.get(0).getTiny());
-
+		
     loadMainImage();
 
     //mosaicImage = mosaicImage.contrast(2.0); // Testing
@@ -40,8 +40,8 @@ class Main {
     for (Tile tile : imageTiles) {
       ImmutableImage tileImage = ImmutableImage.create(tile.length, tile.length);
       
-      tileImage = tileImage.map(pixel -> new RGBColor(tile.r, tile.g, tile.b).awt()); // This works
-			// tileImage = Pexels.getImageFromListByColor(tile.r, tile.g, tile.b);
+      ytileImage = tileImage.map(pixel -> new RGBColor(tile.r, tile.g, tile.b).awt()); // This works
+			//tileImage = Pexels.getImageFromListByColor(tile.r, tile.g, tile.b);
       mosaicImage = mosaicImage.overlay(tileImage, tile.x, tile.y);
     }
 

@@ -8,6 +8,7 @@ import com.sksamuel.scrimage.color.*;
 import com.sksamuel.scrimage.pixels.*;
 import com.sksamuel.scrimage.nio.*;
 import com.sksamuel.scrimage.filter.*;
+import org.apache.commons.io.*;
 
 public class Pexels {
 
@@ -104,7 +105,6 @@ public class Pexels {
 					images.add(img);
 				}
 			}
-			System.out.println(((PexelsImage)(imagesByColor.values().toArray()[0])).getID());
 		} catch (Exception e) {
 			System.out.println("Error retrieving images: " + e.getMessage());
 		}
@@ -130,23 +130,9 @@ public class Pexels {
 
 		URL url = new URL(currentImg.getTiny());
 
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    byte[] fileContent = IOUtils.toByteArray(url);
 
-    try (InputStream stream = url.openStream()) {
-      byte[] buffer = new byte[4096];
-			
-			while (true) {
-        int bytesRead = stream.read(buffer);
-        if (bytesRead < 0)
-					break;
-				
-        output.write(buffer, 0, bytesRead);
-      }
-		}
-
-    byte[] bytes = output.toByteArray();
-
-		ImmutableImage image = ImmutableImage.loader().fromBytes(bytes);
+		ImmutableImage image = ImmutableImage.loader().fromBytes(fileContent);
 		
 		return image;
 	}
